@@ -50,4 +50,52 @@ const registerNewUser = async (req, res) => {
   }
 };
 
-module.exports = { registerNewUser };
+const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email) {
+    return res.status(400).json({ msg: "O email é obrigatório" });
+  }
+
+  if (!emailIsValid(email)) {
+    return res.status(400).json({ msg: "O email não é válido" });
+  }
+
+  if (!password) {
+    return res.status(400).json({ msg: "A senha é obrigatória" });
+  }
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return res.status(404).json({ msg: "Usuário não encontrado" });
+  }
+
+  const checkPassword = await bcrypt.compare(password, user.password);
+
+  if (!checkPassword) {
+    return res.status(400).json({ msg: "Senha inválida" });
+  }
+
+  try {
+    const secret = process.env.SECRET;
+
+    const token = jwt.sign(
+      {
+        id: user.id,
+      },
+      secret,
+      {
+        expiresIn: "1h",
+      }
+    );
+
+    res.status(200).json({ msg: "Autenticação realizada com sucesso", token });
+  } catch (error) {
+    res.status(500).json({
+      msg: "Ocorreu um erro ao tentar logar o usuário, tente novamente mais tarde",
+    });
+  }
+};
+
+module.exports = { registerNewUser, login };
