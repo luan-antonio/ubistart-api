@@ -1,6 +1,6 @@
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-require("dotenv").config();
 const mongoose = require("mongoose");
 
 const { DB_USER, DB_PASS, PORT } = process.env;
