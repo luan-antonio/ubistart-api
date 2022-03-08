@@ -43,22 +43,23 @@ const get = async ({ decodedToken: { id } }, res) => {
 };
 
 const close = async ({ body: { taskId, finished } }, res) => {
+  const task = await Task.findById(taskId);
+  if (!task) {
+    return res.status(404).json({ msg: "A tarefa não foi encontrada" });
+  }
+  if (task.finished) {
+    return res
+      .status(403)
+      .json({ msg: "Não é possível editar uma tarefa fechada" });
+  }
   try {
-    const task = await Task.findById(taskId);
-    if (!task) {
-      return res.status(404).json({ msg: "A tarefa não foi encontrada" });
-    }
-    if (task.finished) {
-      return res
-        .status(403)
-        .json({ msg: "Não é possível editar uma tarefa fechada" });
-    }
-    const closedTask = await Task.updateOne({ _id: taskId }, { finished });
-    if (closedTask.matchedCount === 0) {
+    const updateResult = await Task.updateOne({ _id: taskId }, { finished });
+    if (updateResult.matchedCount === 0) {
       return res.status(404).json({
         msg: "Tarefa não encontrada",
       });
     }
+    const closedTask = await Task.findById(taskId);
     res.status(200).json({ closedTask, msg: "Tarefa fechada" });
   } catch (error) {
     res.status(500).json({
@@ -66,4 +67,32 @@ const close = async ({ body: { taskId, finished } }, res) => {
     });
   }
 };
-module.exports = { add, get, close };
+
+const edit = async ({ body: { taskId, lastEdited, dueDate, desc } }, res) => {
+  const task = await Task.findById(taskId);
+  if (!task) {
+    return res.status(404).json({ msg: "A tarefa não foi encontrada" });
+  }
+  if (task.finished) {
+    return res
+      .status(403)
+      .json({ msg: "Não é possível editar uma tarefa fechada" });
+  }
+  try {
+    const fieldsToEdit = { dueDate, lastEdited, desc };
+    const updateResult = await Task.updateOne({ _id: taskId }, fieldsToEdit);
+
+    if (updateResult.matchedCount === 0) {
+      return res.status(404).json({ msg: "A tarefa não foi encontrada" });
+    }
+
+    const newTask = await Task.findById(taskId);
+
+    res.status(200).json({ newTask, msg: "Tarefa editada com sucesso" });
+  } catch (error) {
+    res.status(500).json({
+      msg: "Ocorreu um erro ao tentar editar a tarefa, tente novamente mais tarde",
+    });
+  }
+};
+module.exports = { add, get, close, edit };

@@ -7,5 +7,6 @@ const router = express.Router();
 router.post("/", checkToken, TaskController.add);
 router.get("/", checkToken, TaskController.get);
 router.post("/close", checkToken, TaskController.close);
+router.post("/edit", checkToken, TaskController.edit);
 
 module.exports = router;
