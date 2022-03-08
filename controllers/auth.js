@@ -3,9 +3,10 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const emailIsValid = require("../helpers/emailValidator");
 
-const registerNewUser = async (req, res) => {
-  const { email, password, confirmPassword, type } = req.body;
-
+const registerNewUser = async (
+  { body: { email, password, confirmPassword, type } },
+  res
+) => {
   if (!email) {
     return res.status(400).json({ msg: "O nome é obrigatório" });
   }
@@ -55,9 +56,7 @@ const registerNewUser = async (req, res) => {
   }
 };
 
-const login = async (req, res) => {
-  const { email, password } = req.body;
-
+const login = async ({ body: { email, password } }, res) => {
   if (!email) {
     return res.status(400).json({ msg: "O email é obrigatório" });
   }
