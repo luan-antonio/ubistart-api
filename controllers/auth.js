@@ -4,7 +4,7 @@ const User = require("../models/User");
 const emailIsValid = require("../helpers/emailValidator");
 
 const registerNewUser = async (req, res) => {
-  const { email, password, confirmPassword } = req.body;
+  const { email, password, confirmPassword, type } = req.body;
 
   if (!email) {
     return res.status(400).json({ msg: "O nome é obrigatório" });
@@ -35,9 +35,14 @@ const registerNewUser = async (req, res) => {
   const salt = await bcrypt.genSalt(12);
   const passwordHash = await bcrypt.hash(password, salt);
 
+  const userType = {
+    ADMIN: "ADMIN",
+  };
+
   const user = new User({
     email,
     password: passwordHash,
+    type: userType[type] || "DEFAULT",
   });
 
   try {
