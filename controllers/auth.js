@@ -90,7 +90,7 @@ const login = async ({ body: { email, password } }, res) => {
       },
       secret,
       {
-        expiresIn: "1h",
+        expiresIn: "8h",
       }
     );
 
