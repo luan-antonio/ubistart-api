@@ -44,7 +44,7 @@ const get = async ({ decodedToken: { id } }, res) => {
 };
 
 const pagination = async (
-  { decodedToken: { id }, query: { page = 1, limit = 10 } },
+  { decodedToken: { id }, query: { page = 1, limit = 10, filter = "none" } },
   res
 ) => {
   const user = await User.findById(id);
@@ -60,11 +60,16 @@ const pagination = async (
   }
 
   try {
-    const tasks = await Task.find()
+    let queryObject = {};
+    if (filter === "late") {
+      queryObject = { dueDate: { $lt: Date.now() } };
+    }
+    const tasks = await Task.find(queryObject)
+      .populate("author", "email")
       .limit(limit)
       .skip((page - 1) * limit);
 
-    const count = await Task.countDocuments();
+    const count = await Task.countDocuments(queryObject);
 
     res
       .status(200)
