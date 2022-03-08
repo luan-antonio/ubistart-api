@@ -6,7 +6,6 @@ const schema = mongoose.Schema({
   title: String,
   dueDate: Number,
   lastEdited: Number,
-  status: String,
   finished: Number,
   author: { type: mongoose.Types.ObjectId, ref: "User" },
 });

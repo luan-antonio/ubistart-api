@@ -19,7 +19,6 @@ const add = async (
     desc,
     title,
     dueDate,
-    status: "OPEN",
   });
 
   try {
@@ -43,4 +42,28 @@ const get = async ({ decodedToken: { id } }, res) => {
   }
 };
 
-module.exports = { add, get };
+const close = async ({ body: { taskId, finished } }, res) => {
+  try {
+    const task = await Task.findById(taskId);
+    if (!task) {
+      return res.status(404).json({ msg: "A tarefa não foi encontrada" });
+    }
+    if (task.finished) {
+      return res
+        .status(403)
+        .json({ msg: "Não é possível editar uma tarefa fechada" });
+    }
+    const closedTask = await Task.updateOne({ _id: taskId }, { finished });
+    if (closedTask.matchedCount === 0) {
+      return res.status(404).json({
+        msg: "Tarefa não encontrada",
+      });
+    }
+    res.status(200).json({ closedTask, msg: "Tarefa fechada" });
+  } catch (error) {
+    res.status(500).json({
+      msg: "Ocorreu um erro ao tentar fechar a tarefa, tente novamente mais tarde ",
+    });
+  }
+};
+module.exports = { add, get, close };
