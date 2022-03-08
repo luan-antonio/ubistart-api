@@ -1,6 +1,6 @@
 const Task = require("../models/Task");
 
-const newTask = async (
+const add = async (
   { decodedToken: { id }, body: { timestamp, desc, title, dueDate } },
   res
 ) => {
@@ -19,19 +19,28 @@ const newTask = async (
     desc,
     title,
     dueDate,
-    status: "OPEN"
+    status: "OPEN",
   });
 
   try {
     await task.save();
     res.status(201).json({ msg: "Tarefa adicionada com sucesso" });
   } catch (error) {
-    res
-      .status(500)
-      .json({
-        msg: "Ocorreu um erro ao tentar adicionar a tarefa, tente novamente mais tarde",
-      });
+    res.status(500).json({
+      msg: "Ocorreu um erro ao tentar adicionar a tarefa, tente novamente mais tarde",
+    });
   }
 };
 
-module.exports = { newTask };
+const get = async ({ decodedToken: { id } }, res) => {
+  try {
+    const tasks = await Task.find({ author: id });
+    res.json(tasks);
+  } catch (error) {
+    res.status(500).json({
+      msg: "Ocorreu um erro ao tentar carregar as tarefas, tente novamente mais tarde",
+    });
+  }
+};
+
+module.exports = { add, get };
