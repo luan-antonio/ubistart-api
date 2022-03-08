@@ -4,6 +4,7 @@ const cors = require("cors");
 const mongoose = require("mongoose");
 
 const authRoutes = require("./routes/auth");
+const taskRoutes = require("./routes/task");
 
 const { DB_USER, DB_PASS, PORT } = process.env;
 
@@ -11,6 +12,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 app.use("/auth", authRoutes);
+app.use("/task", taskRoutes);
 
 mongoose
   .connect(
