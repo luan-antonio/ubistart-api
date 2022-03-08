@@ -6,6 +6,7 @@ const router = express.Router();
 
 router.post("/", checkToken, TaskController.add);
 router.get("/", checkToken, TaskController.get);
+router.get("/pagination", checkToken, TaskController.pagination)
 router.post("/close", checkToken, TaskController.close);
 router.post("/edit", checkToken, TaskController.edit);
 

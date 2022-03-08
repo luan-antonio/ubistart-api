@@ -16,7 +16,7 @@ app.use("/task", taskRoutes);
 
 mongoose
   .connect(
-    `mongodb+srv://${DB_USER}:${DB_PASS}@ubistart.rlpug.mongodb.net/ubistartTODO?retryWrites=true&w=majority`
+    process.env.MONGO_URI
   )
   .then(
     app.listen(PORT, () => {
